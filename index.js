@@ -4,29 +4,23 @@ const mongoose = require('mongoose');
 const app = express();
 app.use(express.json());
 
-// Test API
+// ROUTE TEST – RẤT QUAN TRỌNG
 app.get('/', (req, res) => {
-  res.send('Backend is running');
+  res.status(200).send('Backend is running OK');
 });
 
-// MongoDB connection
-const MONGO_URI = process.env.MONGODB_URI;
+const PORT = process.env.PORT || 3000;
 
-if (!MONGO_URI) {
-  console.error('MONGODB_URI is missing');
-  process.exit(1);
+// DB: không để crash app
+if (process.env.MONGODB_URI) {
+  mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.error('MongoDB error:', err.message));
+} else {
+  console.log('No MongoDB URI');
 }
 
-mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => {
-    console.error(err);
-    process.exit(1);
-  });
-
-// IMPORTANT: Render PORT
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+// LISTEN ĐÚNG CỔNG RENDER
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });
